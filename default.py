@@ -66,9 +66,9 @@ def getRequest(url, user_data=None, headers = {'User-Agent':USER_AGENT,
 
 def getSources(fanart):
               pset = '0ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-              addDir('All Programs',pset,'GA',icon,addonfanart,'All Programs',GENRE_TV,'')
-              addDir('Programs A to Z',pset,'GZ',icon,addonfanart,'Programs A to Z',GENRE_TV,'')
-              addDir('Search','dummy','GQ',icon,addonfanart,'Search',GENRE_TV,'')
+              addDir(__language__(30012),pset,'GA',icon,addonfanart,__language__(30012),GENRE_TV,'')
+              addDir(__language__(30013),pset,'GZ',icon,addonfanart,__language__(30013),GENRE_TV,'')
+              addDir(__language__(30014),'dummy','GQ',icon,addonfanart,__language__(30014),GENRE_TV,'')
 
 def getQuery(cat_url):
         keyb = xbmc.Keyboard('', __addonname__)
