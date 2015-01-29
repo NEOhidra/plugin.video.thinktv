@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.thinktv"
        name="ThinkTV PBS"
-       version="1.0.1"
+       version="1.0.2"
        provider-name="t1m">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -11,8 +11,8 @@
         <provides>video</provides>
   </extension>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en">Smithsonian Video Addon</summary>
-    <description lang="en">Think TV PBS</description>
+    <summary lang="en">Think TV PBS</summary>
+    <description lang="en">Think TV PBS Video Addon</description>
     <disclaimer lang="en">Feel free to use this script. For information visit the wiki.</disclaimer>
     <platform>all</platform>
     <language>en</language>

@@ -31,7 +31,7 @@ def log(txt):
     xbmc.log(msg=message, level=xbmc.LOGDEBUG)
 
 def cleanname(name):    
-    return name.replace('&apos;',"'").replace('&#8217;',"'").replace('&amp;','&').replace('&#39;',"'")
+    return name.replace('&apos;',"'").replace('&#8217;',"'").replace('&amp;','&').replace('&#39;',"'").replace('&quot;','"')
 
 def demunge(munge):
         try:
@@ -65,6 +65,23 @@ def getRequest(url, user_data=None, headers = {'User-Agent':USER_AGENT,
 
 
 def getSources(fanart):
+              pset = '0ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+              addDir('All Programs',pset,'GA',icon,addonfanart,'All Programs',GENRE_TV,'')
+              addDir('Programs A to Z',pset,'GZ',icon,addonfanart,'Programs A to Z',GENRE_TV,'')
+              addDir('Search','dummy','GQ',icon,addonfanart,'Search',GENRE_TV,'')
+
+def getQuery(cat_url):
+        keyb = xbmc.Keyboard('', __addonname__)
+        keyb.doModal()
+        if (keyb.isConfirmed()):
+              qurl = urllib.quote_plus('/search/?q=%s' % (keyb.getText()))
+              getCats(qurl)
+
+def showAtoZ(azurl):
+        for a in azurl:
+              addDir(a,a,'GA',icon,addonfanart,a,GENRE_TV,'')
+                
+def getAtoZ(gzurl):
               pg = getRequest('http://video.pbs.org/programs/list',None, 
                     {'X-Requested-With': 'XMLHttpRequest', 
                      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -73,33 +90,41 @@ def getSources(fanart):
                      'Accept-Language': 'en-US,en;q=0.8'})
               log("GS pg="+str(pg))
               a = json.loads(pg)
-              for y in '0ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+              for y in gzurl:
                 try:
                   b = a[y]
                   for x in b:
                      showname = cleanname('%s [%s]' %(x['title'], x['video_count']))
-                     showurl = urllib.quote_plus(x['slug']+'/episodes/')
+                     showurl = urllib.quote_plus('program/%s/episodes/' % x['slug'])
                      addDir(showname.encode(UTF8),showurl.encode(UTF8),'GC',icon,addonfanart,showname,GENRE_TV,'')
                 except:
                   pass
 
 def getCats(gcurl):
               gcurl = urllib.unquote_plus(gcurl)
-              pg = getRequest('http://video.pbs.org/program/%s' % (gcurl))
+              if 'search/?q=' in gcurl:
+                chsplit = '&'
+                gcurl = gcurl.replace(' ','+')
+              else:
+                chsplit = '?'
+              log("final gcurl = "+str(gcurl))
+              pg = getRequest('http://video.pbs.org/%s' % (gcurl))
               epis = re.compile('<li class="videoItem".+?data-videoid="(.+?)".+?data-title="(.+?)".+?src="(.+?)".+?class="description">(.+?)<.+?<p class="duration">(.+?)</p></li>').findall(pg)
               for url,name,img,desc,dur in epis:
                   surl = '%s?mode=GS&url=%s' %(sys.argv[0], urllib.quote_plus(url))
                   addLink(surl,cleanname(name),img,addonfanart,cleanname(desc),GENRE_TV,'')
               try:
-                  (npurl, npname) = re.compile('/li><li class="visiblePage"><a href="(.+?)">(.+?)<').search(pg).groups(1)
-                  npurl = npurl.split('?',1)[1]
-                  npurl = urllib.quote_plus(gcurl.split('?',1)[0]+'?'+npurl)
-                  npname = '[COLOR blue]%s[/COLOR]' % npname
-                  addDir(npname,npurl,'GC',icon,addonfanart,npname,GENRE_TV,'')
+                  nps = re.compile('visiblePage"><a href="(.+?)">(.+?)<').findall(pg)
+                  (npurl, npname) = nps[len(nps)-1]
+                  if npname == 'Next':
+                     npurl = npurl.split(chsplit,1)[1]
+                     npurl = urllib.quote_plus(gcurl.split(chsplit,1)[0]+chsplit+npurl)
+                     npname = '[COLOR blue]%s[/COLOR]' % npname
+                     addDir(npname,npurl,'GC',icon,addonfanart,npname,GENRE_TV,'')
               except:
                   pass
 
-                  
+                 
 
 
 def getShow(gsurl):
@@ -186,6 +211,9 @@ except:
 if mode==  None:  getSources(p('fanart'))
 elif mode=='SR':  xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=p('url')))
 elif mode=='PP':  play_playlist(p('name'), p('playlist'))
+elif mode=='GA':  getAtoZ(p('url'))
+elif mode=='GQ':  getQuery(p('url'))
+elif mode=='GZ':  showAtoZ(p('url'))
 elif mode=='GS':  getShow(p('url'))
 elif mode=='GC':  getCats(p('url'))
 
