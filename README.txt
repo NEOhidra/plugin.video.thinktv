@@ -3,6 +3,7 @@ plugin.video.thinktv
 
 XBMC Addon for Think TV PBS Video website
 
+Version 1.0.5 Add Clips and Previews, speed improvements for big filelist
 Version 1.0.4 Fix for videos with no duration
 Version 1.0.3 Language strings cleanup
 Version 1.0.2 Added Search and A-Z Program listings
