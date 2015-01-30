@@ -131,6 +131,7 @@ def getVids(gvurl,catname):
                   name = __language__(gindex)
                   mode = 'GC'
                   liz  = xbmcgui.ListItem(name,'',icon,icon)
+                  liz.setInfo( 'Video', { "Title": catname, "Plot": name })
                   xbmcplugin.addDirectoryItem(int(sys.argv[1]), '%s?url=%s&name=%s&mode=%s' % (sys.argv[0],qp(url), catname, mode), liz, True)
 
 
