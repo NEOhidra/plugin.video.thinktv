@@ -101,17 +101,16 @@ def getAtoZ(gzurl):
               ilist = []
               azheaders = defaultHeaders
               azheaders['X-Requested-With'] = 'XMLHttpRequest'
-              pg = getRequest('http://video.thinktv.org/programs/list',None, azheaders)
-              log("GS pg="+str(pg))
+              pg = getRequest('http://video.pbs.org/programs/list',None, azheaders)
               a = json.loads(pg)
               for y in gzurl:
                 try:
                   b = a[y]
                   for x in b:
-                     fullname = cleanname('%s [%s]' %(x['title'], x['video_count']))
-                     name = cleanname(x['title'])
-                     plot = cleanname(x['producer'])
-                     url = 'program/%s' % (x['slug'])
+                     fullname = cleanname('%s [%s]' %(x['title'], x['video_count'])).encode(UTF8)
+                     name = cleanname(x['title']).encode(UTF8)
+                     plot = cleanname(x['producer']).encode(UTF8)
+                     url = ('program/%s' % (x['slug'])).encode(UTF8)
                      mode = 'GV'
                      u = '%s?url=%s&name=%s&mode=%s' % (sys.argv[0],qp(url), qp(name), mode)
                      liz=xbmcgui.ListItem(fullname, '','DefaultFolder.png', icon)
@@ -123,7 +122,7 @@ def getAtoZ(gzurl):
 
 def getVids(gvurl,catname):
               gvurl = uqp(gvurl)
-              pg = getRequest('http://video.thinktv.org/%s' % (gvurl))
+              pg = getRequest('http://video.pbs.org/%s' % (gvurl))
               dolist = [('episodes','<h2>Full Episodes',30020), ('shorts','<h2>Clips', 30021), ('previews', '<h2>Previews', 30022)]
               for gtype, gfind, gindex in dolist:
                 if gfind in pg:
@@ -143,7 +142,7 @@ def getCats(gcurl, catname):
                 gcurl = gcurl.replace(' ','+')
               else:
                 chsplit = '?'
-              pg = getRequest('http://video.thinktv.org/%s' % (gcurl))
+              pg = getRequest('http://video.pbs.org/%s' % (gcurl))
               epis = re.compile('<li class="videoItem".+?data-videoid="(.+?)".+?data-title="(.+?)".+?src="(.+?)".+?class="description">(.+?)<(.+?)</li>').findall(pg)
               for url,name,img,desc,dur in epis:
                      if 'class="duration"' in dur:
@@ -151,8 +150,8 @@ def getCats(gcurl, catname):
                         dur = dur.strip()
                      else:
                         dur = ''
-                     name = cleanname(name)
-                     plot = cleanname(desc)
+                     name = cleanname(name).encode(UTF8)
+                     plot = cleanname(desc).encode(UTF8)
                      mode = 'GS'
                      u = '%s?url=%s&name=%s&mode=%s' % (sys.argv[0],qp(url), qp(name), mode)
                      liz=xbmcgui.ListItem(name, plot,'DefaultFolder.png', img)
@@ -178,7 +177,7 @@ def getCats(gcurl, catname):
 
 
 def getShow(gsurl):
-              pg = getRequest('http://video.thinktv.org/videoInfo/%s/?format=json' % (uqp(gsurl)))
+              pg = getRequest('http://video.pbs.org/videoInfo/%s/?format=json' % (uqp(gsurl)))
               url = json.loads(pg)['recommended_encoding']['url']
               pg = getRequest('%s?format=json' % url)
               url = json.loads(pg)['url']
