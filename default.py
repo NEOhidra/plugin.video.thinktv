@@ -22,6 +22,8 @@ home          = addon.getAddonInfo('path').decode(UTF8)
 icon          = xbmc.translatePath(os.path.join(home, 'icon.png'))
 addonfanart   = xbmc.translatePath(os.path.join(home, 'fanart.jpg'))
 
+
+
 qp  = urllib.quote_plus
 uqp = urllib.unquote_plus
 
@@ -169,6 +171,13 @@ def getCats(gcurl, catname):
                      if 'class="duration"' in dur:
                         dur = re.compile('<p class="duration">(.+?)</p>').search(dur).group(1)
                         dur = dur.strip()
+                        if ':' in dur:
+                          durs = dur.split(':',1)
+                          dur = int(durs[0])
+                          if ':' in durs[1]:
+                             durs = durs[1].split(':',1)
+                             dur = (dur*60)+int(durs[0])
+                          dur = str(dur)
                      else:
                         dur = ''
                      name = cleanname(name)
@@ -199,7 +208,10 @@ def getCats(gcurl, catname):
 
 def getShow(gsurl):
               pg = getRequest('http://video.pbs.org/videoInfo/%s/?format=json' % (uqp(gsurl)))
-              url = json.loads(pg)['recommended_encoding']['url']
+              a  =  json.loads(pg)
+              suburl = a['closed_captions_url']
+              log("suburl = "+str(suburl))
+              url = a['recommended_encoding']['url']
               pg = getRequest('%s?format=json' % url)
               url = json.loads(pg)['url']
               if '.m3u8' in url:
@@ -209,6 +221,31 @@ def getShow(gsurl):
                  except:
                    pass
               xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path = url))
+              xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+              doEod = False
+
+              if (suburl != "") and ('dfxp' in suburl) and (addon.getSetting('sub_enable') == "true"):
+                 profile = addon.getAddonInfo('profile').decode(UTF8)
+                 subfile = xbmc.translatePath(os.path.join(profile, 'PBSSubtitles.srt'))
+                 prodir  = xbmc.translatePath(os.path.join(profile))
+                 if not os.path.isdir(prodir):
+                    os.makedirs(prodir)
+
+                 pg = getRequest(suburl)
+                 if pg != "":
+                   ofile = open(subfile, 'w+')
+                   captions = re.compile('<p.+?begin="(.+?)".+?end="(.+?)".+?>(.+?)</p>').findall(pg)
+                   idx = 1
+                   for cstart, cend, caption in captions:
+                     cstart = cstart.replace('.',',')
+                     cend   = cend.replace('.',',')
+                     caption = caption.replace('<br/>','\n')
+                     ofile.write( '%s\n%s --> %s\n%s\n\n' % (idx, cstart, cend, caption))
+                     idx = idx+1
+                   ofile.close()
+                   xbmc.sleep(5000)
+                   xbmc.Player().setSubtitles(subfile)
 
 
 # MAIN EVENT PROCESSING STARTS HERE
@@ -227,6 +264,8 @@ p = parms.get
 
 mode = p('mode',None)
 
+doEod = True
+
 if mode==  None:  getSources(p('fanart'))
 elif mode=='SR':  xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=p('url')))
 elif mode=='GA':  getAtoZ(p('url'))
@@ -236,5 +275,6 @@ elif mode=='GS':  getShow(p('url'))
 elif mode=='GC':  getCats(p('url'),p('name'))
 elif mode=='GV':  getVids(p('url'),p('name'))
 
-xbmcplugin.endOfDirectory(int(sys.argv[1]))
+if doEod:
+   xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
