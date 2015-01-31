@@ -150,8 +150,8 @@ def getCats(gcurl, catname):
                         dur = dur.strip()
                      else:
                         dur = ''
-                     name = cleanname(name).encode(UTF8)
-                     plot = cleanname(desc).encode(UTF8)
+                     name = cleanname(name)
+                     plot = cleanname(desc)
                      mode = 'GS'
                      u = '%s?url=%s&name=%s&mode=%s' % (sys.argv[0],qp(url), qp(name), mode)
                      liz=xbmcgui.ListItem(name, plot,'DefaultFolder.png', img)
