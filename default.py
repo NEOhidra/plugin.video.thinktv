@@ -221,9 +221,6 @@ def getShow(gsurl):
                  except:
                    pass
               xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path = url))
-              xbmcplugin.endOfDirectory(int(sys.argv[1]))
-
-              doEod = False
 
               if (suburl != "") and ('dfxp' in suburl) and (addon.getSetting('sub_enable') == "true"):
                  profile = addon.getAddonInfo('profile').decode(UTF8)
@@ -235,14 +232,14 @@ def getShow(gsurl):
                  pg = getRequest(suburl)
                  if pg != "":
                    ofile = open(subfile, 'w+')
-                   captions = re.compile('<p.+?begin="(.+?)".+?end="(.+?)".+?>(.+?)</p>').findall(pg)
+                   captions = re.compile('<p begin="(.+?)" end="(.+?)">(.+?)</p>').findall(pg)
                    idx = 1
                    for cstart, cend, caption in captions:
                      cstart = cstart.replace('.',',')
-                     cend   = cend.replace('.',',')
+                     cend   = cend.replace('.',',').split('"',1)[0]
                      caption = caption.replace('<br/>','\n')
                      ofile.write( '%s\n%s --> %s\n%s\n\n' % (idx, cstart, cend, caption))
-                     idx = idx+1
+                     idx += 1
                    ofile.close()
                    xbmc.sleep(5000)
                    xbmc.Player().setSubtitles(subfile)
@@ -264,8 +261,6 @@ p = parms.get
 
 mode = p('mode',None)
 
-doEod = True
-
 if mode==  None:  getSources(p('fanart'))
 elif mode=='SR':  xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=p('url')))
 elif mode=='GA':  getAtoZ(p('url'))
@@ -275,6 +270,5 @@ elif mode=='GS':  getShow(p('url'))
 elif mode=='GC':  getCats(p('url'),p('name'))
 elif mode=='GV':  getVids(p('url'),p('name'))
 
-if doEod:
-   xbmcplugin.endOfDirectory(int(sys.argv[1]))
+xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
