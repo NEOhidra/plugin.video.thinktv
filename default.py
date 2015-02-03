@@ -237,11 +237,11 @@ def getShow(gsurl):
                    for cstart, cend, caption in captions:
                      cstart = cstart.replace('.',',')
                      cend   = cend.replace('.',',').split('"',1)[0]
-                     caption = caption.replace('<br/>','\n')
+                     caption = caption.replace('<br/>','\n').replace('&gt;','>')
                      ofile.write( '%s\n%s --> %s\n%s\n\n' % (idx, cstart, cend, caption))
                      idx += 1
                    ofile.close()
-                   xbmc.sleep(5000)
+                   xbmc.sleep(2000)
                    xbmc.Player().setSubtitles(subfile)
 
 
