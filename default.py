@@ -214,7 +214,7 @@ def getShow(gsurl):
               url = a['recommended_encoding']['url']
               pg = getRequest('%s?format=json' % url)
               url = json.loads(pg)['url']
-              if '.m3u8' in url:
+              if ('.m3u8' in url) and addon.getSetting('vid_res') == '1':
                  try:
                    url = url.split('hls-64-800k',1)[0]
                    url += 'hls-2500k.m3u8'
