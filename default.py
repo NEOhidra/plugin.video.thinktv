@@ -20,6 +20,7 @@ __language__  = addon.getLocalizedString
 
 home          = addon.getAddonInfo('path').decode(UTF8)
 icon          = xbmc.translatePath(os.path.join(home, 'icon.png'))
+pkicon        = xbmc.translatePath(os.path.join(home, 'PBS_Kids_ICON.png'))
 addonfanart   = xbmc.translatePath(os.path.join(home, 'fanart.jpg'))
 
 
@@ -92,10 +93,10 @@ def getRequest(url, user_data=None, headers = defaultHeaders , alert=True):
 
 def getSources(fanart):
               url = '0ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-              dolist = [('GA', 30012), ('GZ', 30013), ('GQ', 30014), ('GKS', 30015)]
-              for mode, gstr in dolist:
+              dolist = [('GA', 30012, icon), ('GZ', 30013, icon), ('GQ', 30014, icon), ('GKS', 30015, pkicon)]
+              for mode, gstr, img in dolist:
                   name = __language__(gstr)
-                  liz  = xbmcgui.ListItem(name,'',icon,icon)
+                  liz  = xbmcgui.ListItem(name,'',img,img)
                   xbmcplugin.addDirectoryItem(int(sys.argv[1]), '%s?url=%s&mode=%s' % (sys.argv[0],qp(url), mode), liz, True)
 
 
@@ -249,7 +250,6 @@ def getPBSKidsShows():
         pg = getRequest('http://pbskids.org/pbsk/video/api/getShows/?callback=&destination=national&return=images')
         pg = pg.strip('()')
         a = json.loads(pg)['items']
-#        print "a = "+str(a)
         for b in a:
               name = b['title']
               plot = b['description']
@@ -268,7 +268,7 @@ def getPBSKidsCats(kcurl, kcname, img):
         dolist = [('episode', 30020), ('clip', 30021)]
         for kctype, iname in dolist:
               name = __language__(iname)
-              url = 'http://pbskids.org/pbsk/video/api/getVideos/?callback=&startindex=1&endindex=200&program=%s&type=%s&category=&group=&selectedID=&status=available&player=flash&flash=true' % (kcname.replace('-','%20'), kctype)
+              url = 'http://pbskids.org/pbsk/video/api/getVideos/?callback=&startindex=1&endindex=200&program=%s&type=%s&category=&group=&selectedID=&status=available&player=flash&flash=true' % (kcname.replace('-',' ').replace('&','&amp;'), kctype)
               mode = 'GKV'
               u = '%s?url=%s&name=%s&mode=%s' % (sys.argv[0],qp(url), qp(kcname), mode)
               liz=xbmcgui.ListItem(name, '','DefaultFolder.png', img)
@@ -278,9 +278,7 @@ def getPBSKidsCats(kcurl, kcname, img):
           
 def getPBSKidsVids(kvurl,kvname):
         ilist=[]
-        print "kvurl = "+str(uqp(kvurl))
-        pg = getRequest(uqp(kvurl).replace(' ','%20'))
-#        print "pg = "+str(pg)
+        pg = getRequest(uqp(kvurl).replace(' ','+').replace('&amp;','%26'))
         pg = pg.strip('()')
         a = json.loads(pg)['items']
         for b in a:
@@ -291,7 +289,6 @@ def getPBSKidsVids(kvurl,kvname):
                  captions = b['captions']['srt']['url']
                except:
                  captions = ''
-               print "video choices = "+str(b['videos']['flash'])
                try:
                   url = b['videos']['flash']['mp4-2500k']['url']
                except:
@@ -306,7 +303,6 @@ def getPBSKidsVids(kvurl,kvname):
                liz.setInfo( 'Video', { "Title": name, "Studio" : kvname, "Plot": plot})
                liz.setProperty('IsPlayable', 'true')
                ilist.append((u, liz, False))
-#        print "ilist = "+str(ilist)
         xbmcplugin.addDirectoryItems(int(sys.argv[1]), ilist, len(ilist))
 
 def playPBSKidsVid(purl, captions):
