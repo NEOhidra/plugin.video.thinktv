@@ -24,6 +24,9 @@ home          = addon.getAddonInfo('path').decode(UTF8)
 media         = xbmc.translatePath(os.path.join(home, 'resources', 'media'))
 icon          = xbmc.translatePath(os.path.join(home, 'icon.png'))
 addonfanart   = xbmc.translatePath(os.path.join(home, 'fanart.jpg'))
+
+icon_featured = xbmc.translatePath(os.path.join(media, 'featured.png'))
+icon_popular  = xbmc.translatePath(os.path.join(media, 'popular.png'))
 icon_a_to_z   = xbmc.translatePath(os.path.join(media, 'a_to_z.png'))
 icon_all_prog = xbmc.translatePath(os.path.join(media, 'all_programs.png'))
 icon_search   = xbmc.translatePath(os.path.join(media, 'search.png'))
@@ -99,7 +102,9 @@ def getRequest(url, user_data=None, headers = defaultHeaders , alert=True):
 
 def getSources(fanart):
               url = '0ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-              dolist = [('GF', 30017, icon),('GP', 30016, icon),('GA', 30012, icon_all_prog), ('GZ', 30013, icon_a_to_z), ('GQ', 30014, icon_search), ('GKS', 30015, pkicon)]
+              dolist = [('GF', 30017, icon_featured),('GP', 30016, icon_popular),('GA', 30012, icon_all_prog), 
+                        ('GZ', 30013, icon_a_to_z), ('GQ', 30014, icon_search), ('GKS', 30015, pkicon)]
+
               for mode, gstr, img in dolist:
                   name = __language__(gstr)
                   liz  = xbmcgui.ListItem(name,'',img,img)
