@@ -375,6 +375,11 @@ def getPBSKidsVids(kvurl,kvname):
 def playPBSKidsVid(purl, captions):
         html = getRequest('%s?format=json' % uqp(purl))
         url = json.loads(html)['url']
+        try:
+             url = 'http://kids.video.cdn.pbs.org/%s' % url.split('mp4:',1)[1]
+        except:
+             pass
+
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path = url))
         if (captions != "") and (addon.getSetting('sub_enable') == "true"):
             xbmc.sleep(5000)
