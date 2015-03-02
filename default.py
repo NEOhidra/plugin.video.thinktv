@@ -376,7 +376,7 @@ def playPBSKidsVid(purl, captions):
         html = getRequest('%s?format=json' % uqp(purl))
         url = json.loads(html)['url']
         try:
-             url = 'http://kids.video.cdn.pbs.org/%s' % url.split('mp4:',1)[1]
+             url = 'http://kids.video.cdn.pbs.org/videos/%s' % url.split(':videos/',1)[1]
         except:
              pass
 
